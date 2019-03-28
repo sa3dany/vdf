@@ -359,13 +359,14 @@ def binary_loads(s, mapper=dict, merge_duplicate_keys=True, alt_format=False):
 
     return stack.pop()
 
-def binary_dumps(obj, alt_format=False):
+def binary_dumps(obj, alt_format=False, utf8=False):
     """
     Serialize ``obj`` to a binary VDF formatted ``bytes``.
     """
-    return b''.join(_binary_dump_gen(obj, alt_format=alt_format))
+    return b''.join(_binary_dump_gen(obj, alt_format=alt_format,
+                    utf8=utf8))
 
-def _binary_dump_gen(obj, level=0, alt_format=False):
+def _binary_dump_gen(obj, level=0, alt_format=False, utf8=False):
     if level == 0 and len(obj) == 0:
         return
 
@@ -393,8 +394,12 @@ def _binary_dump_gen(obj, level=0, alt_format=False):
                 value = value.encode('ascii') + BIN_NONE
                 yield BIN_STRING
             except:
-                value = value.encode('utf-16') + BIN_NONE*2
-                yield BIN_WIDESTRING
+                if utf8:
+                    value = value.encode('utf-8') + BIN_NONE
+                    yield BIN_STRING
+                else:
+                    value = value.encode('utf-16') + BIN_NONE*2
+                    yield BIN_WIDESTRING
             yield key + BIN_NONE + value
         elif isinstance(value, float):
             yield BIN_FLOAT32 + key + BIN_NONE + float32.pack(value)
