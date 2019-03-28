@@ -363,8 +363,7 @@ def binary_dumps(obj, alt_format=False, utf8=False):
     """
     Serialize ``obj`` to a binary VDF formatted ``bytes``.
     """
-    return b''.join(_binary_dump_gen(obj, alt_format=alt_format,
-                    utf8=utf8))
+    return b''.join(_binary_dump_gen(obj, alt_format=alt_format, utf8=utf8))
 
 def _binary_dump_gen(obj, level=0, alt_format=False, utf8=False):
     if level == 0 and len(obj) == 0:
@@ -383,7 +382,8 @@ def _binary_dump_gen(obj, level=0, alt_format=False, utf8=False):
 
         if isinstance(value, dict):
             yield BIN_NONE + key + BIN_NONE
-            for chunk in _binary_dump_gen(value, level+1, alt_format=alt_format):
+            for chunk in _binary_dump_gen(value, level+1,
+                                          alt_format=alt_format, utf8=utf8):
                 yield chunk
         elif isinstance(value, UINT_64):
             yield BIN_UINT64 + key + BIN_NONE + uint64.pack(value)
